@@ -157,6 +157,7 @@ fun CardBasketScreen(navController: NavController, viewModel: ProductDetailViewM
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
+                            modifier = Modifier.padding(bottom = 46.dp),
                             text = "Total Count: $totalCount",
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -167,7 +168,7 @@ fun CardBasketScreen(navController: NavController, viewModel: ProductDetailViewM
                         )
                     }
 
-                    Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
+                    Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth().padding(bottom = 65.dp)) {
                         Text(text = "Checkout")
                     }
                 }

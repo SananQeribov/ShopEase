@@ -21,4 +21,3 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
         job.cancel()
     }
 }
-//https://api.alquran.cloud/v1/surah
