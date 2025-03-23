@@ -24,6 +24,7 @@ val networkModule = module {
                    ignoreUnknownKeys = true
                     explicitNulls = false
                 })
+
             }
             install(Logging) {
                 level = LogLevel.ALL

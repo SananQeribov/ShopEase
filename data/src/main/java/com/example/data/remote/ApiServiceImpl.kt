@@ -4,9 +4,12 @@ import android.util.Log
 import com.example.data.model.CartResponse
 import com.example.data.model.ProductModel
 import com.example.data.model.request.AddToCartRequest
-import com.example.domain.model.CartItemModel
+import com.example.data.model.request.LoginRequest
+import com.example.data.model.request.RegisterRequest
+import com.example.data.model.response.UserResponse
 import com.example.domain.model.CartModel
 import com.example.domain.model.Product
+import com.example.domain.model.UserModel
 import com.example.domain.model.request.AddCartRequestModel
 import com.example.domain.remote.ApiService
 import com.example.domain.util.ResultWrapper
@@ -22,8 +25,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
-import io.ktor.util.InternalAPI
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.IOException
 import java.util.concurrent.TimeoutException
@@ -31,20 +32,21 @@ import java.util.concurrent.TimeoutException
 
 class ApiServiceImpl(val client: HttpClient) : ApiService {
     private val baseUrl = "https://fakestoreapi.com"
-        override suspend fun getProducts(category: String?): ResultWrapper<List<Product>> {
-val url = if (category!=null)"$baseUrl/products/category/$category" else "$baseUrl/products"
-            return makeWebRequest(
-                url = url,
-                method = HttpMethod.Get,
-                mapper = { dataModels: List<ProductModel> ->
-                    dataModels.map { it.toProduct() }
-                      })
+    override suspend fun getProducts(category: String?): ResultWrapper<List<Product>> {
+        val url =
+            if (category != null) "$baseUrl/products/category/$category" else "$baseUrl/products"
+        return makeWebRequest(
+            url = url,
+            method = HttpMethod.Get,
+            mapper = { dataModels: List<ProductModel> ->
+                dataModels.map { it.toProduct() }
+            })
 
-        }
+    }
 
     override suspend fun getCategories(): ResultWrapper<List<String>> {
         val url = "$baseUrl/products/categories"
-        return makeWebRequest<List<String>,List<String>>(
+        return makeWebRequest<List<String>, List<String>>(
             url = url,
             method = HttpMethod.Get,
         )
@@ -57,11 +59,31 @@ val url = if (category!=null)"$baseUrl/products/category/$category" else "$baseU
             body = AddToCartRequest.fromCartRequestModel(request),
             mapper = { cartItem: CartResponse ->
                 cartItem.toCartModel()
-            })    }
+            })
+    }
 
+    override suspend fun login(email: String, password: String): ResultWrapper<UserModel> {
+        val url = "$baseUrl/users"
+        return makeWebRequest(url = url,
+            method = HttpMethod.Post,
+            body = LoginRequest(email, password),
+            mapper = { user: UserResponse ->
+                user.toDomainModel()
+            })
+    }
 
-
-
+    override suspend fun register(
+        email: String,
+        password: String,
+        name: String
+    ): ResultWrapper<UserModel> {
+        val url = "$baseUrl/users"
+        return makeWebRequest(
+            url = url,
+            method = HttpMethod.Post,
+            body = RegisterRequest(email,password,name), mapper = {user:UserResponse->user.toDomainModel()}
+        )
+    }
 
 
     suspend inline fun <reified T, R> makeWebRequest(
@@ -98,12 +120,9 @@ val url = if (category!=null)"$baseUrl/products/category/$category" else "$baseU
 
         } catch (e: ClientRequestException) {
             ResultWrapper.Failure(e)
-        }
-        catch (e: TimeoutException) {
+        } catch (e: TimeoutException) {
             ResultWrapper.Failure(e)
-        }
-
-        catch (e: ServerResponseException) {
+        } catch (e: ServerResponseException) {
             ResultWrapper.Failure(e)
         } catch (e: IOException) {
             Log.e("Api service error", "$e")

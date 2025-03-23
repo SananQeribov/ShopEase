@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SplashScreen.ShopEase" parent="Theme.SplashScreen.IconBackground">
+
+        <item name="windowSplashScreenBackground">#906929</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/shopease</item>
+        <item name="windowSplashScreenIconBackgroundColor">#FFFFFF</item>
+        <item name="postSplashScreenTheme">@style/Theme.ShopEase</item>
+    </style>
+</resources>

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
@@ -28,22 +29,36 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
+import com.example.shopease.ShopperSession
 import com.example.shopease.model.UiProductModel
 import com.example.shopease.navigation.CartScreen
 import com.example.shopease.navigation.HomeScreen
+import com.example.shopease.navigation.LoginScreen
 import com.example.shopease.navigation.ProductDetails
 import com.example.shopease.navigation.ProfileScreen
+import com.example.shopease.navigation.RegisterScreen
 import com.example.shopease.navigation.productNavType
+import com.example.shopease.ui.theme.screen.account.login.LoginScreen
+import com.example.shopease.ui.theme.screen.account.register.RegisterScreen
 import com.example.shopease.ui.theme.screen.cart.CardBasketScreen
 import com.example.shopease.ui.theme.screen.product_detail.ProductDetailScreen
+import com.example.shopease.viewModel.LogoViewModel
 import kotlin.reflect.typeOf
 
 class MainActivity : ComponentActivity() {
+    private val viewModel by viewModels<LogoViewModel>()
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
+            .apply {
+                setKeepOnScreenCondition {
+                    viewModel.isLoading.value
+                }
+            }
         setContent {
             ShopEaseTheme {
                 val shouldShowBottomNav = remember {
@@ -58,11 +73,27 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ){
-                    NavHost(navController = navController, startDestination = HomeScreen) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = if (ShopperSession.getUser() != null) {
+                            HomeScreen
+                        } else {
+                            LoginScreen
+                        }
+                    ) {
+                        composable<LoginScreen> {
+                            shouldShowBottomNav.value = false
+                            LoginScreen(navController)
+                        }
+                        composable<RegisterScreen> {
+                            shouldShowBottomNav.value = false
+                            RegisterScreen(navController)
+                        }
                         composable<HomeScreen> { HomeScreen(navController)
                             shouldShowBottomNav.value = true
                         }
                         composable<CartScreen> { CardBasketScreen(navController)
+
                             shouldShowBottomNav.value = true
                         }
                         composable<ProfileScreen> { Box(modifier = Modifier.fillMaxSize()){
@@ -80,8 +111,6 @@ class MainActivity : ComponentActivity() {
                                 ProductDetailScreen(navController, productRoute.product)
                             }
                         }
-
-
                     }
 
                 }

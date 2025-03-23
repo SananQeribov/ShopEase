@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.domain.model.Product
 import com.example.domain.model.request.AddCartRequestModel
 import com.example.domain.usercase.CartUserCase
+import com.example.domain.util.ResultWrapper
 import com.example.shopease.model.UiProductModel
 import com.example.shopease.utils.BasketScreenUIEvents
 import com.example.shopease.utils.HomeScreenUIEvents
@@ -88,16 +89,19 @@ class ProductDetailViewModel(val usaCase:CartUserCase):ViewModel() {
                 )
             )
             when (result) {
-                is com.example.domain.util.ResultWrapper.Success -> {
+                is ResultWrapper.Success -> {
                     _state.value = ProductDetailsEvent.Success("Product added to cart")
                     Log.e("bs","${_state.value}")
                 }
 
-                is com.example.domain.util.ResultWrapper.Failure -> {
+                is ResultWrapper.Failure -> {
 
                     _state.value = ProductDetailsEvent.Error("Something went wrong!")
                     Log.e("bs","${_state.value}")
                 }
+
+                is ResultWrapper.Failure -> TODO()
+                is ResultWrapper.Success -> TODO()
             }
         }
     }
