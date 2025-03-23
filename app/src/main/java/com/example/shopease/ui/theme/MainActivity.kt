@@ -36,6 +36,7 @@ import com.example.shopease.navigation.HomeScreen
 import com.example.shopease.navigation.ProductDetails
 import com.example.shopease.navigation.ProfileScreen
 import com.example.shopease.navigation.productNavType
+import com.example.shopease.ui.theme.screen.cart.CardBasketScreen
 import com.example.shopease.ui.theme.screen.product_detail.ProductDetailScreen
 import kotlin.reflect.typeOf
 
@@ -61,10 +62,9 @@ class MainActivity : ComponentActivity() {
                         composable<HomeScreen> { HomeScreen(navController)
                             shouldShowBottomNav.value = true
                         }
-                        composable<CartScreen> { Box(modifier = Modifier.fillMaxSize()){
-                            Text(text = "Cart")
+                        composable<CartScreen> { CardBasketScreen(navController)
                             shouldShowBottomNav.value = true
-                        } }
+                        }
                         composable<ProfileScreen> { Box(modifier = Modifier.fillMaxSize()){
                             Text(text = "Profile")
                             shouldShowBottomNav.value = true
@@ -80,6 +80,8 @@ class MainActivity : ComponentActivity() {
                                 ProductDetailScreen(navController, productRoute.product)
                             }
                         }
+
+
                     }
 
                 }

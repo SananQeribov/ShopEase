@@ -11,7 +11,6 @@ val viewModelModule = module {
         HomeViewModel(get(),get())
 
     }
-    viewModel {
-        ProductDetailViewModel(get())
-    }
+    single { ProductDetailViewModel(get()) }
+
 }

@@ -150,13 +150,13 @@ fun ProductDetailScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Button(
-                onClick = { viewModel.addProductToCart(productModel) },
+                onClick = { viewModel.addBasket(productModel) },
                 modifier = Modifier.weight(1f)
             ) {
                 Text(text = "Buy Now")
             }
             IconButton(
-                onClick = { viewModel.addProductToCart(productModel) },
+                onClick = { viewModel.addBasket(productModel) },
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)

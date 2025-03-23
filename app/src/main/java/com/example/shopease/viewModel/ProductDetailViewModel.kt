@@ -1,6 +1,8 @@
 package com.example.shopease.viewModel
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.model.Product
@@ -19,29 +21,56 @@ class ProductDetailViewModel(val usaCase:CartUserCase):ViewModel() {
     val state = _state.asStateFlow()
 
 
-    private val _products = MutableStateFlow<List<UiProductModel>>(emptyList())
-    val products = _products.asStateFlow()
-
-    private val _basketUi = MutableStateFlow<BasketScreenUIEvents>(BasketScreenUIEvents.Loading)
+    private val _basketUi = MutableStateFlow<BasketScreenUIEvents>(BasketScreenUIEvents.Initial)
     val basketUi = _basketUi.asStateFlow()
 
+    private val _products = MutableLiveData<List<UiProductModel>>(emptyList())
+    val products: LiveData<List<UiProductModel>> = _products
 
 
-    private fun addBasket(product: UiProductModel) {
-        viewModelScope.launch {
-            _basketUi.value = BasketScreenUIEvents.Loading
+    fun removeBasket(product: UiProductModel) {
 
-            var currentList = products.value.toMutableList()
-            currentList.add(product)
+        val currentList = _products.value?.toMutableList() ?: mutableListOf()
 
-            _basketUi.value = BasketScreenUIEvents.Success(currentList.toList())
+        val updatedList = currentList.map {
+            if (it.id == product.id) {
+
+                it.copy(count = it.count - 1)
+            } else {
+                it
+            }
+        }.toMutableList()
 
 
+        val finalList = updatedList.filter { it.count > 0 }.toMutableList()
 
 
+        _products.value = finalList
+
+        _basketUi.value = BasketScreenUIEvents.Success(finalList)
+    }
 
 
+    fun addBasket(product: UiProductModel) {
+        val currentList = _products.value?.toMutableList() ?: mutableListOf()
+
+
+        val updatedList = currentList.map {
+            if (it.id == product.id) {
+
+                it.copy(count = it.count + 1)
+            } else {
+                it
+            }
+        }.toMutableList()
+
+
+        if (updatedList.none { it.id == product.id }) {
+            updatedList.add(product.copy(count = 1))
         }
+        _products.value = updatedList
+
+        _basketUi.value = BasketScreenUIEvents.Success(updatedList)
     }
 
     var _basket = MutableStateFlow<ProductDetailsEvent>(ProductDetailsEvent.Nothing)

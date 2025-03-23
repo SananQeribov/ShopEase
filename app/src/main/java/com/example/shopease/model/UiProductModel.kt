@@ -13,7 +13,8 @@ data class UiProductModel(
     val price: Double,
     val category:String,
     val description: String,
-    val image: String
+    val image: String,
+    var count:Int =1
 ) :Parcelable {
 companion object{
         fun fromProduct(product: Product) = UiProductModel(
